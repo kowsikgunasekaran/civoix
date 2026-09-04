@@ -65,7 +65,7 @@ export default function CitizenNotifications() {
                             <div key={n.id} className="card-sm" style={{ borderLeft: n.confirmed ? '3px solid var(--accent-emerald)' : '3px solid var(--accent-amber)' }}>
                                 <div className="flex justify-between items-center" style={{ marginBottom: '0.5rem' }}>
                                     <span className="font-mono text-sm">{n.citizenHash}</span>
-                                    <span className="text-xs text-muted">{n.timestamp}</span>
+                                    <span className="text-xs text-muted">{new Date(n.timestamp).toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' })}</span>
                                 </div>
                                 <div className="flex gap-2" style={{ marginBottom: '0.75rem' }}>
                                     <span className="badge badge-synthetic">{n.channel}</span>
@@ -73,7 +73,7 @@ export default function CitizenNotifications() {
                                     <span className="badge badge-indigo">{n.eventType}</span>
                                 </div>
                                 <div className="text-sm" style={{ marginBottom: '0.25rem' }}>{n.message}</div>
-                                <div className="text-xs text-muted" style={{ marginBottom: '1rem', fontStyle: 'italic' }}>"{n.translation}"</div>
+                                <div className="text-xs text-muted" style={{ marginBottom: '1rem', fontStyle: 'italic' }}>"{n.translatedMessage ?? n.translation}"</div>
                                 <div className="flex justify-between items-center">
                                     <span className="text-xs font-semibold" style={{ color: n.confirmed ? 'var(--accent-emerald)' : 'var(--accent-amber)' }}>
                                         {n.confirmed ? '✓ Confirmed' : '⌛ Pending'}
@@ -100,7 +100,7 @@ export default function CitizenNotifications() {
                                 </div>
                                 <div className="text-xs text-muted" style={{ marginBottom: '0.25rem' }}>Sentiment Score</div>
                                 <div className="progress-track" style={{ height: '6px' }}>
-                                    <div className="progress-fill" style={{ width: `${w.sentimentScore}%`, background: w.sentimentScore > 80 ? 'var(--accent-emerald)' : 'var(--accent-amber)' }}></div>
+                                    <div className="progress-fill" style={{ width: `${w.sentimentScore * 100}%`, background: w.sentimentScore > 0.8 ? 'var(--accent-emerald)' : 'var(--accent-amber)' }}></div>
                                 </div>
                             </div>
                         ))}

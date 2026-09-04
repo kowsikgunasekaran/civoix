@@ -12,8 +12,14 @@ export default function IntegrityEngine() {
         { id: 'a3', type: 'Template Spam', ward: 'W-09', requestCount: 89, similarity: 100, status: 'Flagged', timespan: '5h', devices: 89 }
     ];
 
-    const stats = INTEGRITY_STATS || {
-        scanned: '1.2M', blocked: '42.5K', confidence: '99.8%', activeThreats: 3
+    const rawStats = INTEGRITY_STATS || {
+        totalScanned: 1200000, quarantined: 42500, falsePositiveRate: 0.002, flagged: 3
+    };
+    const stats = {
+        scanned: rawStats.totalScanned.toLocaleString('en-IN'),
+        blocked: rawStats.quarantined.toLocaleString('en-IN'),
+        confidence: `${((1 - rawStats.falsePositiveRate) * 100).toFixed(1)}%`,
+        activeThreats: anomalies.filter(a => a.status !== 'Cleared').length
     };
 
     const timelineData = Array.from({length: 24}, (_, i) => ({
@@ -94,8 +100,8 @@ export default function IntegrityEngine() {
                                                 <div style={{ width: `${Math.min(a.requestCount / 4, 100)}%`, height: '100%', background: a.requestCount > 100 ? 'var(--accent-rose)' : 'var(--accent-amber)' }}></div>
                                             </div>
                                         </td>
-                                        <td className="font-mono">{a.similarity}%</td>
-                                        <td><span className={`badge ${a.status === 'Blocked' ? 'badge-rose' : (a.status === 'Investigating' ? 'badge-amber' : 'badge-muted')}`}>{a.status}</span></td>
+                                        <td className="font-mono">{Math.round((a.templateSimilarity ?? a.similarity / 100 ?? 0) * 100)}%</td>
+                                        <td><span className={`badge ${a.status === 'Quarantined' || a.status === 'Blocked' ? 'badge-rose' : (a.status === 'Investigating' ? 'badge-amber' : 'badge-muted')}`}>{a.status}</span></td>
                                     </tr>
                                     <AnimatePresence>
                                         {expandedRow === a.id && (
@@ -105,8 +111,8 @@ export default function IntegrityEngine() {
                                                         <div className="card-sm" style={{ margin: '0.5rem', background: 'var(--bg-surface)', borderLeft: '3px solid var(--accent-rose)' }}>
                                                             <div className="flex justify-between items-center">
                                                                 <div className="flex gap-4">
-                                                                    <div><span className="text-xs text-muted">Timespan:</span> <span className="font-bold">{a.timespan}</span></div>
-                                                                    <div><span className="text-xs text-muted">Unique Devices:</span> <span className="font-bold">{a.devices}</span></div>
+                                                                    <div><span className="text-xs text-muted">Timespan:</span> <span className="font-bold">{a.timespan ?? `${a.timespanMinutes}m`}</span></div>
+                                                                    <div><span className="text-xs text-muted">Unique Devices:</span> <span className="font-bold">{a.devices ?? a.deviceCount}</span></div>
                                                                 </div>
                                                                 <div className="flex gap-2">
                                                                     <button className="btn btn-sm btn-ghost">Dismiss</button>

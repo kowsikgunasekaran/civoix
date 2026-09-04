@@ -15,10 +15,22 @@ export default function DataFusion() {
         { id: 1, name: 'Water Pipe Extension', ward: 'W-01', score: 85, budget: '1.2Cr' },
         { id: 2, name: 'Solar Streetlights', ward: 'W-04', score: 92, budget: '0.8Cr' }
     ];
-    const gaps = INFRA_GAP_INDICES || [
-        { ward: 'W-01', water: 40, power: 20, road: 15 },
-        { ward: 'W-02', water: 10, power: 50, road: 30 }
-    ];
+    const gaps = INFRA_GAP_INDICES && INFRA_GAP_INDICES.length > 0
+        ? Object.values(INFRA_GAP_INDICES.reduce((acc, row) => {
+            if (!acc[row.ward]) acc[row.ward] = { ward: row.ward, _gap: 0, _nat: 0, _n: 0 };
+            acc[row.ward]._gap += row.gapIndex;
+            acc[row.ward]._nat += row.nationalAvg;
+            acc[row.ward]._n += 1;
+            return acc;
+        }, {})).map(w => ({
+            ward: w.ward,
+            gapIndex: +(w._gap / w._n * 100).toFixed(0),
+            nationalAvg: +(w._nat / w._n * 100).toFixed(0)
+        }))
+        : [
+            { ward: 'W-01', gapIndex: 40, nationalAvg: 20 },
+            { ward: 'W-02', gapIndex: 10, nationalAvg: 50 }
+        ];
 
     return (
         <div>
@@ -102,18 +114,17 @@ export default function DataFusion() {
 
                 {/* 4. Infra-Gap Heatmap */}
                 <div className="card" style={{ marginBottom: '2rem' }}>
-                    <h2 className="font-bold" style={{ marginBottom: '1rem' }}>Infra-Gap Index by Ward</h2>
+                    <h2 className="font-bold" style={{ marginBottom: '1rem' }}>Infra-Gap Index by Ward (avg across sectors, vs. national average)</h2>
                     <div style={{ height: 300 }}>
                         <ResponsiveContainer width="100%" height="100%">
                             <BarChart data={gaps} layout="vertical">
                                 <CartesianGrid stroke="var(--border)" />
-                                <XAxis type="number" stroke="var(--text-muted)" />
-                                <YAxis dataKey="ward" type="category" stroke="var(--text-muted)" />
+                                <XAxis type="number" stroke="var(--text-muted)" domain={[0, 100]} />
+                                <YAxis dataKey="ward" type="category" stroke="var(--text-muted)" width={120} />
                                 <Tooltip contentStyle={{ backgroundColor: 'var(--bg-card)', borderColor: 'var(--border)' }} />
                                 <Legend />
-                                <Bar dataKey="water" stackId="a" fill="var(--accent-cyan)" />
-                                <Bar dataKey="power" stackId="a" fill="var(--accent-amber)" />
-                                <Bar dataKey="road" stackId="a" fill="var(--accent-indigo)" />
+                                <Bar dataKey="gapIndex" name="Ward Gap Index" fill="var(--accent-rose)" />
+                                <Bar dataKey="nationalAvg" name="National Avg" fill="var(--accent-indigo)" />
                             </BarChart>
                         </ResponsiveContainer>
                     </div>

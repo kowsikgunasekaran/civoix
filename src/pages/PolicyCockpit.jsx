@@ -5,7 +5,7 @@ import { useBudgetStore } from '../store/budgetStore'
 import { useProjectStore } from '../store/projectStore'
 import { HOTSPOT_COLORS } from '../data/clusters'
 import { REQUESTS } from '../data/requests'
-import { RadarChart, Radar, PolarGrid, PolarAngleAxis, ResponsiveContainer, BarChart, Bar, XAxis, YAxis, Tooltip, ErrorBar, LineChart, Line, CartesianGrid } from 'recharts'
+import { RadarChart, Radar, PolarGrid, PolarAngleAxis, ResponsiveContainer, BarChart, Bar, XAxis, YAxis, Tooltip, ErrorBar, LineChart, Line, CartesianGrid, Cell } from 'recharts'
 
 export default function PolicyCockpit() {
   const { weights, budgetCap, rankedClusters, setWeight, setBudgetCap, resetWeights } = useBudgetStore()
